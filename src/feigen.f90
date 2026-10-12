@@ -329,9 +329,13 @@ contains
 
 function edge_path(e) result(p)
   !! Nodes along edge e: first vertex, edge nodes, second vertex
+  ! Allocatable result: ifx 2026.1.1 miscompiles an automatic result sized by the host's ne
+  ! when draw2d calls this function (segfault, or wrong nodes with -check all).
   integer, intent(in) :: e
-  integer :: p(ne + 2), k
+  integer, allocatable :: p(:)
+  integer :: k
 
+  allocate (p(ne + 2))
   p(1) = ev(1,e)
   p(ne+2) = ev(2,e)
   p(2:ne+1) = [(nv + (e - 1)*ne + k, k = 1, ne)]

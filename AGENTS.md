@@ -74,6 +74,9 @@ Done means: the tests pass for every compiler you have in both profiles, and
   fplotlib's module `fplotlib_contour` and procedure `contour` to the same symbol.
 - fpm compiles stdlib's C sources with `icx` for ifx; `ci.sh` sets `FPM_CC=gcc` when `icx`
   is missing.
+- ifx 2026.1.1 miscompiles an internal function with an automatic result sized by a host
+  variable when a sibling internal procedure calls it: `edge_path` in `plot_modes` has an
+  allocatable result instead.
 - gfortran does not deallocate main-program allocatables at the end, and the debug
   profile's LeakSanitizer reports them: the app and the test deallocate them explicitly.
 

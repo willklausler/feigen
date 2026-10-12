@@ -1,6 +1,8 @@
-program main
+program element_modes
+  !! Command-line front end: build one element, print its eigenvalues and mode names,
+  !! and plot every mode. `feigen --help` lists the options.
+  use, intrinsic :: iso_fortran_env, only: dp => real64
   use flap, only: command_line_interface
-  use, intrinsic :: iso_fortran_env, only: rk => real64
   use cubatures, only: cubature, CUB_LIN, CUB_TRI, CUB_QUA, CUB_TET, CUB_HEX, CUB_WED
   use shapefuncs, only: shapefunc, SHP_LAGRANGE, SHP_SERENDIPITY
   use feigen, only: material, stiffness, modes, name_modes, plot_modes
@@ -11,27 +13,30 @@ program main
   type(shapefunc) :: s
   character(99) :: element, family, coords, output
   integer :: order, degree, elm, fam, error, u, i
-  real(rk) :: E, nu, scale
-  real(rk), allocatable :: X(:,:), K(:,:), lambda(:), phi(:,:), match(:)
+  real(dp) :: E, nu, scale
+  real(dp), allocatable :: X(:,:), K(:,:), lambda(:), phi(:,:), match(:)
   character(40), allocatable :: names(:)
 
   call cli%init(progname='feigen', description='Stiffness eigenmodes of a single finite element')
   call cli%add(switch='--element', switch_ab='-e', help='Element type', def='qua', &
-               choices='lin,tri,qua,tet,hex,wed', act='store', error=error)
-  call cli%add(switch='--order', switch_ab='-p', help='Shape function order', def='1', act='store', error=error)
+             & choices='lin,tri,qua,tet,hex,wed', act='store', error=error)
+  call cli%add(switch='--order', switch_ab='-p', help='Shape function order', def='1', &
+             & act='store', error=error)
   call cli%add(switch='--family', switch_ab='-f', help='Shape function family', def='lagrange', &
-               choices='lagrange,serendipity', act='store', error=error)
-  call cli%add(switch='--degree', switch_ab='-d', help='Cubature degree of exactness, default 2*order', &
-               def='-1', act='store', error=error)
+             & choices='lagrange,serendipity', act='store', error=error)
+  call cli%add(switch='--degree', switch_ab='-d', &
+             & help='Cubature degree of exactness, default 2*order', def='-1', &
+             & act='store', error=error)
   call cli%add(switch='--E', help="Young's modulus", def='1.0', act='store', error=error)
   call cli%add(switch='--nu', help="Poisson's ratio", def='0.3', act='store', error=error)
   call cli%add(switch='--coords', switch_ab='-x', &
-               help='Nodal coordinates file, one node per line, default reference element', &
-               def='', act='store', error=error)
+             & help='Nodal coordinates file, one node per line, default reference element', &
+             & def='', act='store', error=error)
   call cli%add(switch='--scale', switch_ab='-s', help='Mode amplitude relative to element size', &
-               def='0.2', act='store', error=error)
-  call cli%add(switch='--output', switch_ab='-o', help='Plot file (.png, .svg, .pdf), default <element>_p<order>_<fam>.png', &
-               def='', act='store', error=error)
+             & def='0.2', act='store', error=error)
+  call cli%add(switch='--output', switch_ab='-o', &
+             & help='Plot file (.png, .svg, .pdf), default <element>_p<order>_<fam>.png', &
+             & def='', act='store', error=error)
   call cli%parse(error=error)
   if (error /= 0) stop 1, quiet=.true.
   call cli%get(switch='--element', val=element, error=error)
@@ -55,7 +60,7 @@ program main
   fam = merge(SHP_SERENDIPITY, SHP_LAGRANGE, family == 'serendipity')
   if (order < 1) error stop 'feigen: order must be at least 1'
   if (degree < 0) degree = 2*order
-  if (output == '') write (output, '(a,"_p",i0,"_",a,".png")') trim(element), order, family(1:3)
+  if (output == '') write(output, '(a,"_p",i0,"_",a,".png")') trim(element), order, family(1:3)
 
   q = cubature(elm, degree)
   s = shapefunc(q, order, family=fam)
@@ -73,10 +78,11 @@ program main
   call name_modes(X, lambda, phi, names, match)
 
   call s%summary()
-  print '(a,i0,a,i0)', 'cubature points: ', q%npoints, ', zero modes: ', count(lambda == 0)
-  print '(a)', ' mode    eigenvalue  match  name'
-  print '(i5,es14.5,f6.0,"%  ",a)', (i, lambda(i), 100*match(i), trim(names(i)), i = 1, size(lambda))
+  write(*, '(a,i0,a,i0)') 'cubature points: ', q%npoints, ', zero modes: ', count(lambda == 0)
+  write(*, '(a)') ' mode    eigenvalue  match  name'
+  write(*, '(i5,es14.5,f6.0,"%  ",a)') &
+    & (i, lambda(i), 100*match(i), trim(names(i)), i = 1, size(lambda))
 
   call plot_modes(s, X, lambda, phi, names, scale, trim(output))
-  print '(a)', 'wrote '//trim(output)
-end program main
+  write(*, '(a)') 'wrote ' // trim(output)
+end program element_modes

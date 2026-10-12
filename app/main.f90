@@ -85,4 +85,6 @@ program element_modes
 
   call plot_modes(s, X, lambda, phi, names, scale, trim(output))
   write(*, '(a)') 'wrote ' // trim(output)
+  ! gfortran does not free main-program allocatables, and LeakSanitizer would report it
+  deallocate (X, K, lambda, phi, names, match)
 end program element_modes

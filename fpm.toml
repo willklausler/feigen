@@ -4,11 +4,10 @@ license = "MIT"
 author = "Will Klausler"
 maintainer = "226649647+willklausler@users.noreply.github.com"
 copyright = "Copyright 2026, Will Klausler"
-description = "Eigenmodes of single finite elements"
-
-[build]
-auto-executables = true
-auto-tests = true
+description = "Stiffness eigenmodes of a single finite element, named and plotted"
+homepage = "https://github.com/willklausler/feigen"
+categories = ["numerical"]
+keywords = ["finite-elements", "eigenmodes", "stiffness", "hourglass", "plotting"]
 
 [dependencies]
 stdlib = { git = "https://github.com/fortran-lang/stdlib", branch = "stdlib-fpm" }
@@ -16,3 +15,22 @@ fortran_cubatures = { git = "https://github.com/willklausler/fortran_cubatures",
 fortran_shapefuncs = { git = "https://github.com/willklausler/fortran_shapefuncs", tag = "v0.2.0" }
 fplotlib = { git = "https://github.com/certik/fplotlib", rev = "6d0e2f0c64dbf5e6dfe03ca1b6c547dad4a614c0" }
 FLAP = { git = "https://github.com/szaghi/FLAP", tag = "v2.5.3" }
+
+[features]
+debug.gfortran.flags = "-g -Wall -fbacktrace -fcheck=all -Wextra -Wpedantic -Wuninitialized -Wmaybe-uninitialized -Wimplicit-interface -Wimplicit-procedure -Warray-temporaries -Wrealloc-lhs -finit-real=snan -finit-integer=-2147483648 -finit-logical=true -fstack-protector-all"
+debug.gfortran.linux.flags = "-fsanitize=address,undefined"
+debug.ifx.linux.flags = "-g -check all -warn all -traceback -fpe0 -init=snan,arrays -ftrapuv -fp-stack-check -diag-error-limit 10 -fsanitize=address,undefined"
+debug.ifx.windows.flags = "/Zi /check:all /warn:all /traceback /fpe:0 /Qinit:snan,arrays /Qtrapuv"
+# -Mchkptr is omitted: it reports a null pointer inside list-directed derived-type I/O
+debug.nvfortran.flags = "-g -Minform=inform -Mbounds -Mchkstk -Mstandard -Ktrap=fp -traceback"
+debug.flang.flags = "-g"
+
+release.gfortran.flags = "-O3 -fbacktrace -march=native -funroll-loops"
+release.ifx.linux.flags = "-O3 -xHost -unroll"
+release.ifx.windows.flags = "/O3 /QxHost /Qunroll"
+release.nvfortran.flags = "-Mrecursive -fast"
+release.flang.flags = "-O3"
+
+[profiles]
+debug = ["debug"]
+release = ["release"]

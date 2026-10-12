@@ -1,4 +1,4 @@
-program check
+program test_feigen
   use, intrinsic :: iso_fortran_env, only: rk => real64
   use cubatures, only: cubature, CUB_LIN, CUB_TRI, CUB_QUA, CUB_TET, CUB_HEX, CUB_WED
   use shapefuncs, only: shapefunc, SHP_LAGRANGE, SHP_SERENDIPITY
@@ -97,4 +97,4 @@ contains
     end if
   end subroutine close
 
-end program check
+end program test_feigen

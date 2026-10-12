@@ -1,12 +1,14 @@
 # feigen
 
+<img src="logo.png" alt="Figs, two cut open" width="128" align="right">
+
 [![CI](https://github.com/willklausler/feigen/actions/workflows/ci.yml/badge.svg)](https://github.com/willklausler/feigen/actions/workflows/ci.yml)
 [![Docs](https://github.com/willklausler/feigen/actions/workflows/docs.yml/badge.svg)](https://willklausler.github.io/feigen/)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
-Stiffness eigenmodes of a single finite element: feigen solves K·φ = λφ, names
-every mode and plots it. Rigid-body and hourglass modes show up as zero
-eigenvalues.
+Stiffness eigenmodes of a single finite element: feigen (German for figs)
+solves K·φ = λφ, names every mode and plots it. Rigid-body and hourglass modes
+show up as zero eigenvalues.
 
 ```sh
 fpm run -- -e qua -d 1          # 4-node quad, one cubature point
@@ -127,4 +129,6 @@ see [CONTRIBUTING.md](CONTRIBUTING.md). To cite this package, use
 
 ## License
 
-[MIT](LICENSE)
+[MIT](LICENSE). The logo is cropped from a photo by
+[Tijana Drndarski](https://unsplash.com/photos/2-round-black-and-red-fruits-aqdC12GKPUU)
+on Unsplash, under the [Unsplash License](https://unsplash.com/license).

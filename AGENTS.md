@@ -14,6 +14,7 @@ its conventions are in `llms.txt`; read it before changing behaviour.
 | `llms.txt` | API reference for agents, and the online user manual |
 | `man/feigen.3`, `README.md`, `ford.md` | Human documentation |
 | `qua_p1_lag.png`, `hex_p1_lag.png` | README images, made by `fpm run -- -e qua` and `-e hex` |
+| `logo.png` | README logo and FORD favicon: photo by Tijana Drndarski, Unsplash License (credited in README) |
 | `tools/check_docs.py` | CI check: every public name and example is in `llms.txt` |
 | `tools/doc.sh` | FORD build, used by the Docs workflow |
 
@@ -50,7 +51,8 @@ Done means: the tests pass for every compiler you have in both profiles, and
   Errors cannot be caught.
 - The default plot file is `<element>_p<order>_<fam>.png`, `fam` the first three letters
   of the family.
-- The README images are committed generated output, an agreed exception.
+- The README images are committed generated output, an agreed exception. `logo.png` is a
+  256x256 crop of an Unsplash photo; keep the credit in the README License section.
 
 ## Adding or changing a procedure
 

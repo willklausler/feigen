@@ -13,6 +13,7 @@ display: public
 source: true
 search: true
 graph: false
+favicon: logo.png
 ---
 
 `use feigen` gives `material`, `stiffness`, `modes`, `name_modes` and

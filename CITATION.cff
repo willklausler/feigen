@@ -1,0 +1,25 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below."
+title: "feigen: stiffness eigenmodes of a single finite element"
+type: software
+abstract: >-
+  feigen is a Fortran program and module that computes the stiffness matrix of
+  a single isotropic linear elastic finite element and its eigenmodes. Zero
+  eigenvalues reveal rigid-body and hourglass modes. Each mode is named by its
+  best-matching displacement field (translation, rotation, expansion, shear,
+  bending, torsion, warping, hourglass) and plotted, one subplot per mode, as
+  PNG, SVG or PDF. It covers lines, triangles, quadrilaterals, tetrahedra,
+  hexahedra and wedges of any order, is written in Fortran 2018 and builds with fpm.
+authors:
+  - family-names: Klausler
+    given-names: Will
+    orcid: "https://orcid.org/0009-0000-4313-3696"
+version: 0.1.0
+date-released: 2026-10-12
+license: MIT
+repository-code: "https://github.com/willklausler/feigen"
+url: "https://willklausler.github.io/feigen/"
+keywords:
+  - Fortran
+  - finite elements
+  - eigenmodes

@@ -1,0 +1,79 @@
+.TH FEIGEN 3 "2026-10-12" "feigen 0.1.0" "Fortran Library Functions"
+.SH NAME
+feigen \- stiffness eigenmodes of a single finite element, named and plotted
+.SH SYNOPSIS
+.nf
+.B use cubatures
+.B use shapefuncs
+.B use feigen
+.B D = material(dim, E, nu)
+.B K = stiffness(s, q, X, D)
+.B call modes(K, lambda, phi [, tol])
+.B call name_modes(X, lambda, phi, names, match [, tol])
+.B call plot_modes(s, X, lambda, phi, names, scale, filename)
+.fi
+.SH DESCRIPTION
+Module
+.B feigen
+computes the stiffness matrix of one isotropic linear elastic finite element,
+its eigenvalues and eigenvectors, names the modes and plots them. The element
+is a
+.B shapefunc
+s from fortran_shapefuncs at the points of a
+.B cubature
+q from fortran_cubatures, with nodal coordinates X(dim, nnodes). Values are
+real64. Degrees of freedom are ordered node by node.
+.SS Procedures
+.TP
+.BR material ( dim ", " E ", " nu )
+Elasticity matrix in Voigt notation with engineering shear strains, order xx,
+yy, zz, xy, xz, yz: a bar in 1D, plane strain in 2D. Pure.
+.TP
+.BR stiffness ( s ", " q ", " X ", " D )
+K = sum over points of B^T D B det(J) w, size dim*nnodes.
+.TP
+.BR "call modes" ( K ", " lambda ", " phi " [, " tol ])
+Ascending eigenvalues and orthonormal eigenvectors of symmetric K. Eigenvalues
+below tol*max|lambda| (default 1e-10) are set to exactly zero.
+.TP
+.BR "call name_modes" ( X ", " lambda ", " phi ", " names ", " match " [, " tol ])
+Within each group of equal eigenvalues (default tol 1e-8), replace the
+eigenvectors by the projections of the best-matching named fields: translation,
+rotation, expansion, tension/compression, shear, bending, torsion, warping,
+hourglass. match is the cosine between field and eigenspace. Modes without a
+match are named "-". The catalog covers linear line, quadrilateral and
+hexahedral elements.
+.TP
+.BR "call plot_modes" ( s ", " X ", " lambda ", " phi ", " names ", " scale ", " filename )
+One PNG, SVG or PDF, chosen by the extension, with a subplot per mode. The
+largest displacement is scale times the element size.
+.SS Program
+The
+.B feigen
+program wraps the module in a command line; see
+.BR "feigen --help" .
+.SH NOTES
+.B feigen
+does not check its arguments. Invalid elements and orders stop the program in
+fortran_cubatures or fortran_shapefuncs with
+.BR "error stop" ,
+and a singular Jacobian stops it in stdlib. Errors cannot be caught.
+.PP
+Kinds are not exported; use real64 from iso_fortran_env. The module has no
+state.
+.SH EXAMPLE
+.nf
+type(cubature) :: q
+type(shapefunc) :: s
+real(dp) :: K(8,8), lambda(8), phi(8,8)
+q = cubature(CUB_QUA, 1)             ! one point: reduced integration
+s = shapefunc(q, 1)                  ! 4-node quadrilateral
+K = stiffness(s, q, s%coords, material(2, 1._dp, 0.3_dp))
+call modes(K, lambda, phi)
+print *, count(lambda == 0)          ! 5: 3 rigid-body + 2 hourglass
+.fi
+.SH SEE ALSO
+The complete reference is llms.txt in the source distribution and
+https://willklausler.github.io/feigen/
+.SH AUTHOR
+Will Klausler

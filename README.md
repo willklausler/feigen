@@ -86,7 +86,17 @@ There is no make build: the dependencies stdlib, fplotlib and FLAP are fpm packa
 
 ## Compilers
 
-COMPILERS
+CI tests every push on:
+
+| Compiler | Linux | macOS | Windows |
+| --- | --- | --- | --- |
+| gfortran 14 | yes | yes | yes |
+| gfortran 13 | yes | | |
+| ifx 2026 | yes | | yes |
+| LLVM flang 21 | yes | | |
+
+nvfortran cannot build the dependencies stdlib and fplotlib; see
+[llms.txt](llms.txt#compiler-notes).
 
 ## Why feigen?
 

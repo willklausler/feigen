@@ -1,0 +1,109 @@
+# feigen
+
+> Fortran module `feigen` and the program `feigen`: the stiffness matrix of a single isotropic linear elastic finite element, its eigenvalues and eigenvectors, named modes (translation, rotation, expansion, shear, bending, torsion, warping, hourglass) and a plot of every mode as PNG, SVG or PDF. Elements and integration come from fortran_shapefuncs and fortran_cubatures. Fortran 2018, fpm. This file is the complete API reference for tools and coding agents; it is checked against the source in CI.
+
+Use: `use feigen` (everything) or `use feigen, only: material, stiffness, modes, name_modes, plot_modes`, together with `use cubatures` (`cubature`, `CUB_LIN` ... `CUB_WED`) and `use shapefuncs` (`shapefunc`, `SHP_LAGRANGE`, `SHP_SERENDIPITY`).
+fpm dependency: `feigen = { git = "https://github.com/willklausler/feigen", tag = "v0.1.0" }` (it pulls in fortran_cubatures v0.2.0, fortran_shapefuncs v0.2.0, stdlib, fplotlib and FLAP).
+Kinds are not exported: all reals are `real64` from `iso_fortran_env`.
+
+## Conventions (read first)
+
+- An element is a `shapefunc` `s` evaluated at the points of a `cubature` `q` (see fortran_shapefuncs and fortran_cubatures), with nodal coordinates `X(dim, nnodes)`. `s%coords` gives the reference element; any other `X` in the same node numbering gives a distorted element.
+- Degrees of freedom are ordered node by node: u1x, u1y, u2x, u2y, ... `K`, `phi(:,m)` and the catalog fields have size `dim*nnodes`.
+- Strains use Voigt notation with engineering shear strains, ordered xx, yy, zz, xy, xz, yz. The material is isotropic linear elastic: a bar in 1D, plane strain in 2D.
+- Eigenvalues are ascending. `modes` sets those below `tol*max|lambda|` to exactly zero, so `count(lambda == 0)` is the number of zero-energy modes: rigid-body modes, plus hourglass modes under reduced integration.
+- Equal eigenvalues span an eigenspace whose basis is arbitrary. `name_modes` replaces that basis by the projections of named displacement fields, which are exact eigenvectors but not orthogonal to each other.
+- Error policy: `feigen` does not check its arguments. Invalid elements and orders stop with `error stop` in fortran_cubatures (`cubature%set:`) or fortran_shapefuncs (`shapefunc%set:`), a singular Jacobian stops in stdlib's `inv`, and the program stops with messages that start with `feigen:`. Errors cannot be caught.
+- No module state.
+
+## Procedures
+
+| Call | Result |
+|---|---|
+| `material(dim, E, nu)` | elasticity matrix `D(n,n)`, `n = dim*(dim+1)/2`, for Young's modulus `E` and Poisson's ratio `nu`; pure |
+| `stiffness(s, q, X, D)` | stiffness matrix `K(dim*nnodes, dim*nnodes)` = sum over points g of B^T D B det(J) w_g |
+| `call modes(K, lambda, phi [, tol])` | ascending eigenvalues `lambda(n)` and orthonormal eigenvectors `phi(n,n)` of symmetric `K`; eigenvalues below `tol*max|lambda|` (default `1e-10`) become 0 |
+| `call name_modes(X, lambda, phi, names, match [, tol])` | renames and replaces the modes in `phi`, see "Mode names"; `names(n)` needs `len >= 40`; eigenvalues within `tol*max|lambda|` (default `1e-8`) form a group |
+| `call plot_modes(s, X, lambda, phi, names, scale, filename)` | writes one figure with a subplot per mode; the format follows the extension of `filename` (`.png`, `.svg`, `.pdf`); the largest nodal displacement is `scale` times the element size |
+
+`lambda`, `phi`, `names` and `match` are allocated by the caller with `n = size(K,1)`.
+
+## Mode names
+
+`name_modes` compares each eigenspace with a catalog of displacement fields, written in coordinates `x, y, z` centred on the element. A field is accepted when the cosine between it and the eigenspace, `match`, exceeds 0.5; the best match is taken first, ties go to the earlier catalog entry, and fields that depend on already accepted ones are skipped. The accepted field's projection replaces the mode, signed to agree with the field. Modes left over keep an orthonormal remainder of the eigenspace, are named `-` and have `match = 0`.
+
+| dim | Catalog |
+|---|---|
+| 1 | `translation x  u=(1)`, `tension x  u=(x)` |
+| 2 | translation x, y; `rotation z  u=(-y,x)`; `expansion  u=(x,y)`; `tension x/compression y  u=(x,-y)`; `shear xy  u=(y,x)`; `bending x  u=(xy,0)`, `bending y  u=(0,xy)` |
+| 3 | translation x, y, z; rotation x, y, z; `expansion  u=(x,y,z)`; tension/compression x/y, y/z, z/x; shear xy, xz, yz; bending synclastic `u=x(0,y,z)`, `u=y(x,0,z)`, `u=z(x,y,0)` and anticlastic `u=x(0,y,-z)`, `u=y(-x,0,z)`, `u=z(x,-y,0)`; torsion x, y, z `u=x(0,-z,y)` ...; `warping  u=(yz,xz,xy)`; hourglass x, y, z `u=(xyz,0,0)` ... |
+
+The catalog spans the displacements of linear line, quadrilateral and hexahedral elements, so every mode of those elements gets a name with `match = 1`. Higher orders and triangles, tetrahedra and wedges get names only where a mode matches one of these fields. Bending is named by the plane of the fibres that bend: in 3D, `bending xy, synclastic  u=z(x,y,0)` bends x- and y-fibres the same way, the anticlastic one in opposite ways. In 2D the hourglass modes of a 4-node quadrilateral are the bending modes `u=(xy,0)` and `u=(0,xy)`.
+
+## Program
+
+`feigen [options]` (with fpm: `fpm run -- [options]`; after `fpm install`, plain `feigen`) builds one element, prints `s%summary()`, the number of cubature points and zero modes, then a table of eigenvalue, match and name per mode, and writes the plot.
+
+| Option | Default | Meaning |
+|---|---|---|
+| `-e`, `--element` | `qua` | `lin`, `tri`, `qua`, `tet`, `hex`, `wed` |
+| `-p`, `--order` | 1 | shape function order, at least 1 |
+| `-f`, `--family` | `lagrange` | `lagrange` or `serendipity` (quadrilaterals and hexahedra, orders 1 to 3) |
+| `-d`, `--degree` | `2*order` | cubature degree of exactness |
+| `--E`, `--nu` | 1.0, 0.3 | Young's modulus and Poisson's ratio |
+| `-x`, `--coords` | reference element | file with one node per line, `dim` coordinates each, in the node numbering of fortran_shapefuncs |
+| `-s`, `--scale` | 0.2 | largest displacement relative to the element size |
+| `-o`, `--output` | `<element>_p<order>_<fam>.png` | plot file; `fam` is `lag` or `ser`, for example `qua_p2_ser.png` |
+| `-h`, `--help` | | list the options |
+
+## Compiler notes
+
+Tested in CI with gfortran 14 (Linux, macOS, Windows), gfortran 13 (Linux), ifx 2026 (Linux, Windows) and LLVM flang 21 (Linux). No compiler-specific code in feigen. Limits come from the dependencies:
+
+- nvfortran is not supported: nvfortran 26.3 rejects stdlib's `implicit none(type, external)`, and links fplotlib's module `fplotlib_contour` and its procedure `contour` to the same symbol.
+- stdlib has C sources, which fpm compiles with `icx` when the Fortran compiler is ifx. Without `icx`, set `FPM_CC=gcc`.
+- The debug profile of gfortran runs LeakSanitizer, which reports allocatable arrays of a main program that are not deallocated; the app and the test deallocate them.
+
+## Differs from
+
+- The element eigenvalue test of textbooks (Cook et al., Bathe) is usually run in an ad hoc script: assemble one element, call an eigensolver, count the zeros. `feigen` does this for every element of fortran_shapefuncs and also names and plots the modes.
+- General finite element codes compute eigenmodes of an assembled model, usually with a mass matrix (vibration modes), and do not name them.
+- The hourglass base vectors of Flanagan and Belytschko span the zero-energy modes of the one-point quadrilateral and hexahedron; `name_modes` splits that space into the named bending, torsion, warping and hourglass fields.
+
+## Module layout
+
+One module, `feigen`, in `src/feigen.f90`, and the program in `app/main.f90`. It uses the modules `cubatures`, `shapefuncs`, `stdlib_linalg` (`eigh`, `inv`, `det`) and `fplotlib`; the program also uses `flap` for the command line. Nothing is generated.
+
+## Examples
+
+### demo_hourglass.f90
+
+```fortran
+program demo_hourglass
+  !! Reduced integration of a 4-node quadrilateral: one cubature point adds two
+  !! zero-energy hourglass modes to the three rigid-body modes
+  use, intrinsic :: iso_fortran_env, only: dp => real64
+  use cubatures
+  use shapefuncs
+  use feigen
+  implicit none
+  type(cubature) :: q
+  type(shapefunc) :: s
+  real(dp) :: K(8,8), lambda(8), phi(8,8), match(8)
+  character(40) :: names(8)
+  integer :: degree, nzero, i
+
+  do degree = 2, 1, -1                          ! 2x2 points, then 1 point
+    q = cubature(CUB_QUA, degree)
+    s = shapefunc(q, 1)
+    K = stiffness(s, q, s%coords, material(s%dim, 1._dp, 0.3_dp))
+    call modes(K, lambda, phi)
+    call name_modes(s%coords, lambda, phi, names, match)
+    nzero = count(lambda == 0)                  ! 3, then 5
+    write(*, '(a,i0,a,i0)') 'points: ', q%npoints, ', zero modes: ', nzero
+    write(*, '(4x,a)') (trim(names(i)), i = 1, nzero)
+  end do
+  ! translation x, translation y, rotation z;
+  ! with one point also bending x u=(xy,0) and bending y u=(0,xy): the hourglass modes
+end program demo_hourglass
+```

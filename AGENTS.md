@@ -27,7 +27,7 @@ fpm test --profile release
 fpm run --example --all
 fpm run -- -e hex -p 2               # the app; arguments after --
 python3 tools/check_docs.py
-./ci.sh                              # gfortran, ifx, nvfortran if installed
+./ci.sh                              # gfortran and ifx, if installed
 tools/doc.sh                         # FORD HTML in build/doc
 ```
 
@@ -72,6 +72,10 @@ Done means: the tests pass for every compiler you have in both profiles, and
 
 ## Compiler quirks that shaped the code
 
+- LLVM flang 21 is not in CI: it cannot resolve stdlib's kind parameter `ilp` in an
+  `equivalence` statement of the submodule `stdlib_lapack_eigv_gen2`.
+- ifx on Windows is not in CI: setup-fortran installs no `icx` there, which fpm needs for
+  stdlib's C sources.
 - nvfortran is not in CI: 26.3 rejects stdlib's `implicit none(type, external)` and links
   fplotlib's module `fplotlib_contour` and procedure `contour` to the same symbol.
 - fpm compiles stdlib's C sources with `icx` for ifx; `ci.sh` sets `FPM_CC=gcc` when `icx`

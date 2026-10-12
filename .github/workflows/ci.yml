@@ -13,6 +13,9 @@ jobs:
       fail-fast: false
       # No nvidia-hpc: nvfortran rejects stdlib's implicit none(type, external) and links
       # fplotlib's module fplotlib_contour and procedure contour to the same symbol.
+      # No intel on Windows: setup-fortran installs no icx there, which fpm needs for stdlib's C files.
+      # No LLVM flang 21: it cannot resolve stdlib's kind parameter ilp in an equivalence
+      # statement of a submodule (stdlib_lapack_eigv_gen2).
       matrix:
         include:
           - { os: ubuntu-24.04, compiler: gcc, version: 14 }
@@ -20,7 +23,6 @@ jobs:
           - { os: macos-15, compiler: gcc, version: 14 }
           - { os: windows-2025, compiler: gcc, version: 14 }
           - { os: ubuntu-24.04, compiler: intel, version: '2026.1' }
-          - { os: windows-2025, compiler: intel, version: '2026.1' }
     steps:
       - uses: actions/checkout@v7
       - uses: fortran-lang/setup-fortran@v1
@@ -32,11 +34,6 @@ jobs:
         with:
           fpm-version: v0.13.0
           github-token: ${{ secrets.GITHUB_TOKEN }}
-      - name: Remove GNU link, which shadows the MSVC linker that ifx calls
-        if: runner.os == 'Windows' && matrix.compiler == 'intel'
-        run: |
-          Get-Command link -All | Format-Table -AutoSize Source
-          Get-Command link -All | Where-Object { $_.Source -notmatch 'Microsoft Visual Studio' } | ForEach-Object { Remove-Item $_.Source }
       - name: Let fpm find libgfortran
         # The fpm binary for macOS is linked against a gcc version the runner lacks
         if: runner.os == 'macOS'
@@ -49,29 +46,6 @@ jobs:
         run: |
           fpm run --compiler ${{ steps.setup-fortran.outputs.fc }} --profile release --example --all
           fpm run --compiler ${{ steps.setup-fortran.outputs.fc }} --profile release
-
-  flang:
-    name: ubuntu-24.04 LLVM flang 21
-    runs-on: ubuntu-24.04
-    steps:
-      - uses: actions/checkout@v7
-      - name: Install flang
-        run: |
-          wget -q https://apt.llvm.org/llvm.sh
-          sudo bash llvm.sh 21
-          sudo apt-get install -y flang-21
-      - uses: fortran-lang/setup-fpm@v10
-        with:
-          fpm-version: v0.13.0
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-      - name: Test (debug)
-        run: fpm test --compiler flang-21 --profile debug
-      - name: Test (release)
-        run: fpm test --compiler flang-21 --profile release
-      - name: Examples and app
-        run: |
-          fpm run --compiler flang-21 --profile release --example --all
-          fpm run --compiler flang-21 --profile release
 
   checks:
     name: llms.txt

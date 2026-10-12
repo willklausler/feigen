@@ -94,10 +94,9 @@ CI tests every push on:
 | --- | --- | --- | --- |
 | gfortran 14 | yes | yes | yes |
 | gfortran 13 | yes | | |
-| ifx 2026 | yes | | yes |
-| LLVM flang 21 | yes | | |
+| ifx 2026 | yes | | |
 
-nvfortran cannot build the dependencies stdlib and fplotlib; see
+nvfortran, LLVM flang 21 and ifx on Windows cannot build the dependencies; see
 [llms.txt](llms.txt#compiler-notes).
 
 ## Why feigen?

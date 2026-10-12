@@ -58,10 +58,11 @@ The catalog spans the displacements of linear line, quadrilateral and hexahedral
 
 ## Compiler notes
 
-Tested in CI with gfortran 14 (Linux, macOS, Windows), gfortran 13 (Linux), ifx 2026 (Linux, Windows) and LLVM flang 21 (Linux). No compiler-specific code in feigen. Limits come from the dependencies:
+Tested in CI with gfortran 14 (Linux, macOS, Windows), gfortran 13 (Linux) and ifx 2026 (Linux). No compiler-specific code in feigen. Limits come from the dependencies:
 
 - nvfortran is not supported: nvfortran 26.3 rejects stdlib's `implicit none(type, external)`, and links fplotlib's module `fplotlib_contour` and its procedure `contour` to the same symbol.
-- stdlib has C sources, which fpm compiles with `icx` when the Fortran compiler is ifx. Without `icx`, set `FPM_CC=gcc`.
+- LLVM flang 21 is not supported: it cannot resolve stdlib's kind parameter `ilp` in an `equivalence` statement of a submodule.
+- stdlib has C sources, which fpm compiles with `icx` when the Fortran compiler is ifx. Without `icx`, set `FPM_CC=gcc` on Linux. On Windows, CI has no `icx`, so ifx on Windows is untested.
 - The debug profile of gfortran runs LeakSanitizer, which reports allocatable arrays of a main program that are not deallocated; the app and the test deallocate them.
 
 ## Differs from

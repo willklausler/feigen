@@ -8,9 +8,8 @@ source /opt/intel/oneapi/setvars.sh > /dev/null 2>&1
 command -v icx > /dev/null || export FPM_CC=gcc
 FAILED=()
 
-# No nvfortran: 26.3 rejects stdlib's implicit none(type, external) and links
-# fplotlib's module fplotlib_contour and procedure contour to the same symbol.
-for FC in gfortran ifx flang flang-new; do
+# No nvfortran or LLVM flang: they cannot build stdlib or fplotlib (see llms.txt).
+for FC in gfortran ifx; do
     command -v "$FC" > /dev/null || continue
     for PROFILE in debug release; do
         echo "--- $FC $PROFILE"

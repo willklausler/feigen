@@ -53,7 +53,7 @@ The catalog spans the displacements of linear line, quadrilateral and hexahedral
 | `--E`, `--nu` | 1.0, 0.3 | Young's modulus and Poisson's ratio |
 | `-x`, `--coords` | reference element | file with one node per line, `dim` coordinates each, in the node numbering of fortran_shapefuncs |
 | `-s`, `--scale` | 0.2 | largest displacement relative to the element size |
-| `-o`, `--output` | `<element>_p<order>_<fam>.png` | plot file; `fam` is `lag` or `ser`, for example `qua_p2_ser.png` |
+| `-o`, `--output` | `<element>_p<order>_<fam>_d<degree>.png` | plot file; `fam` is `lag` or `ser`, for example `qua_p2_ser_d4.png` |
 | `-h`, `--help` | | list the options |
 
 ## Compiler notes

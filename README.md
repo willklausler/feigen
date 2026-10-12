@@ -1,6 +1,6 @@
 # feigen
 
-<img src="logo.png" alt="Figs, two cut open" width="128" align="right">
+<img src="images/logo.png" alt="Figs, two cut open" width="128" align="right">
 
 [![CI](https://github.com/willklausler/feigen/actions/workflows/ci.yml/badge.svg)](https://github.com/willklausler/feigen/actions/workflows/ci.yml)
 [![Docs](https://github.com/willklausler/feigen/actions/workflows/docs.yml/badge.svg)](https://willklausler.github.io/feigen/)
@@ -18,7 +18,7 @@ fpm run -- -e qua -d 1          # 4-node quad, one cubature point
 #     ...
 #     4   0.00000E+00  100.%  bending x  u=(xy,0)      <- hourglass
 #     ...
-# wrote qua_p1_lag.png
+# wrote qua_p1_lag_d1.png
 fpm run -- -e hex -p 2 -f serendipity -o hex20.svg
 fpm run -- --help
 ```
@@ -36,7 +36,7 @@ call name_modes(s%coords, lambda, phi, names, match)
 call plot_modes(s, s%coords, lambda, phi, names, 0.2_dp, 'modes.svg')
 ```
 
-![Modes of the 4-node quadrilateral](qua_p1_lag.png)
+![Modes of the 4-node quadrilateral](images/qua4_full.png)
 
 > Coding agents: the complete API reference is [llms.txt](llms.txt), and
 > contributor instructions are in [AGENTS.md](AGENTS.md).
@@ -54,7 +54,7 @@ call plot_modes(s, s%coords, lambda, phi, names, 0.2_dp, 'modes.svg')
   torsion, warping, hourglass) with a match percentage; complete for linear line, quad
   and hex elements.
 - One PNG, SVG or PDF with a subplot per mode, named after the element by default
-  (`qua_p1_lag.png`), drawn with [fplotlib](https://github.com/certik/fplotlib).
+  (`qua_p1_lag_d2.png`), drawn with [fplotlib](https://github.com/certik/fplotlib).
 
 Conventions: degrees of freedom node by node, Voigt order xx, yy, zz, xy, xz, yz, and
 eigenvalues below `1e-10*max|λ|` are exactly zero.
@@ -84,7 +84,7 @@ There is no make build: the dependencies stdlib, fplotlib and FLAP are fpm packa
 - `man ./man/feigen.3` ([man/feigen.3](man/feigen.3))
 - Example programs in [example/](example/) (`fpm run --example --all`) and the program in [app/](app/) (`fpm run`)
 
-![Modes of the 8-node hexahedron](hex_p1_lag.png)
+![Modes of the 8-node hexahedron](images/hex8_full.png)
 
 ## Compilers
 

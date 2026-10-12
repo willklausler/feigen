@@ -13,8 +13,8 @@ its conventions are in `llms.txt`; read it before changing behaviour.
 | `example/*.f90` | Demo programs; each is copied verbatim into `llms.txt` |
 | `llms.txt` | API reference for agents, and the online user manual |
 | `man/feigen.3`, `README.md`, `ford.md` | Human documentation |
-| `qua_p1_lag.png`, `hex_p1_lag.png` | README images, made by `fpm run -- -e qua` and `-e hex` |
-| `logo.png` | README logo and FORD favicon: photo by Tijana Drndarski, Unsplash License (credited in README) |
+| `images/qua4_full.png`, `images/hex8_full.png` | README images: `fpm run -- -e qua` and `-e hex`, renamed so later runs cannot overwrite them |
+| `images/logo.png` | README logo and FORD favicon: photo by Tijana Drndarski, Unsplash License (credited in README) |
 | `tools/check_docs.py` | CI check: every public name and example is in `llms.txt` |
 | `tools/doc.sh` | FORD build, used by the Docs workflow |
 
@@ -49,9 +49,9 @@ Done means: the tests pass for every compiler you have in both profiles, and
   fortran_cubatures (`cubature%set:`) and fortran_shapefuncs (`shapefunc%set:`), a singular
   Jacobian stops in stdlib's `inv`, and the app stops with messages that start with `feigen:`.
   Errors cannot be caught.
-- The default plot file is `<element>_p<order>_<fam>.png`, `fam` the first three letters
-  of the family.
-- The README images are committed generated output, an agreed exception. `logo.png` is a
+- The default plot file is `<element>_p<order>_<fam>_d<degree>.png`, `fam` the first three
+  letters of the family; plot files in the root are gitignored.
+- The README images are committed generated output, an agreed exception. `images/logo.png` is a
   256x256 crop of an Unsplash photo; keep the credit in the README License section.
 
 ## Adding or changing a procedure

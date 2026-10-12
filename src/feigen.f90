@@ -275,7 +275,7 @@ subroutine plot_modes(s, X, lambda, phi, names, scale, filename)
   !! Write one PNG, SVG or PDF (chosen by the extension of filename) with a subplot per
   !! mode: undeformed (black), deformed (green), nodal displacements (blue)
   use fplotlib, only: figure, subplot, plot, plot3d, scatter, scatter3d, title, &
-                    & set_aspect, axis, savefig
+                    & set_aspect, axis, tight_layout, savefig
   type(shapefunc), intent(in) :: s
   real(dp), intent(in) :: X(:,:), lambda(:), phi(:,:)
   real(dp), intent(in) :: scale   !! largest displacement relative to the element size
@@ -323,6 +323,7 @@ subroutine plot_modes(s, X, lambda, phi, names, scale, filename)
     call subplot(rows, cols, m)
     call axis("off")
   end do
+  call tight_layout()   ! trim the white border
   call savefig(filename)
 
 contains

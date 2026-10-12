@@ -35,7 +35,7 @@ program element_modes
   call cli%add(switch='--scale', switch_ab='-s', help='Mode amplitude relative to element size', &
              & def='0.2', act='store', error=error)
   call cli%add(switch='--output', switch_ab='-o', &
-             & help='Plot file (.png, .svg, .pdf), default <element>_p<order>_<fam>.png', &
+             & help='Plot file (.png, .svg, .pdf), default <element>_p<order>_<fam>_d<degree>.png', &
              & def='', act='store', error=error)
   call cli%parse(error=error)
   if (error /= 0) stop 1, quiet=.true.
@@ -60,7 +60,7 @@ program element_modes
   fam = merge(SHP_SERENDIPITY, SHP_LAGRANGE, family == 'serendipity')
   if (order < 1) error stop 'feigen: order must be at least 1'
   if (degree < 0) degree = 2*order
-  if (output == '') write(output, '(a,"_p",i0,"_",a,".png")') trim(element), order, family(1:3)
+  if (output == '') write(output, '(a,"_p",i0,"_",a,"_d",i0,".png")') trim(element), order, family(1:3), degree
 
   q = cubature(elm, degree)
   s = shapefunc(q, order, family=fam)

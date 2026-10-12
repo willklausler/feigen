@@ -1,6 +1,7 @@
 !> Stiffness eigenmodes of a single finite element.
 module feigen
-  use cubatures, only: cubature, rk, CUB_LIN, CUB_TRI, CUB_QUA, CUB_TET, CUB_HEX, CUB_WED
+  use, intrinsic :: iso_fortran_env, only: rk => real64
+  use cubatures, only: cubature, CUB_LIN, CUB_TRI, CUB_QUA, CUB_TET, CUB_HEX, CUB_WED
   use shapefuncs, only: shapefunc
   use stdlib_linalg, only: det, inv, eigh
   implicit none

@@ -1,5 +1,6 @@
 program check
-  use cubatures, only: cubature, rk, CUB_LIN, CUB_TRI, CUB_QUA, CUB_TET, CUB_HEX, CUB_WED
+  use, intrinsic :: iso_fortran_env, only: rk => real64
+  use cubatures, only: cubature, CUB_LIN, CUB_TRI, CUB_QUA, CUB_TET, CUB_HEX, CUB_WED
   use shapefuncs, only: shapefunc, SHP_LAGRANGE, SHP_SERENDIPITY
   use feigen, only: material, stiffness, modes, name_modes
   implicit none

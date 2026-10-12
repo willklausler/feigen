@@ -12,7 +12,7 @@ auto-tests = true
 
 [dependencies]
 stdlib = { git = "https://github.com/fortran-lang/stdlib", branch = "stdlib-fpm" }
-fortran_cubatures = { git = "https://github.com/willklausler/fortran_cubatures" }
-fortran_shapefuncs = { git = "https://github.com/willklausler/fortran_shapefuncs" }
-fplotlib = { git = "https://github.com/certik/fplotlib" }
-FLAP = { git = "https://github.com/szaghi/FLAP", tag = "v2.5.0" }
+fortran_cubatures = { git = "https://github.com/willklausler/fortran_cubatures", tag = "v0.2.0" }
+fortran_shapefuncs = { git = "https://github.com/willklausler/fortran_shapefuncs", tag = "v0.2.0" }
+fplotlib = { git = "https://github.com/certik/fplotlib", rev = "6d0e2f0c64dbf5e6dfe03ca1b6c547dad4a614c0" }
+FLAP = { git = "https://github.com/szaghi/FLAP", tag = "v2.5.3" }
